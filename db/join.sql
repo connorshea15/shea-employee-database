@@ -11,5 +11,5 @@ SELECT roles.*, departments.name AS department_name
         CONCAT(m.first_name, ' ', m.last_name) AS manager
         FROM employees e
         LEFT JOIN roles ON e.role_id = roles.id
-        LEFT JOIN departments ON roles.id = departments.id
+        LEFT JOIN departments ON roles.department_id = departments.id
         LEFT JOIN employees m ON m.id = e.manager_id;
