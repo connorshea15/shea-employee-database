@@ -4,6 +4,8 @@ SELECT roles.*, departments.name AS department_name
         FROM roles
         OUTER JOIN departments ON roles.department_id = departments.id;
 
+
+-- This gives me a beautiful table of all employees
         SELECT e.id, e.first_name, e.last_name, 
         roles.title AS title, 
         departments.name AS department, 
