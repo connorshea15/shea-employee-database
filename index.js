@@ -66,7 +66,7 @@ addDepartment = () => {
     });
 };
 
-// Function to add a department
+// Function to add a role
 addRole = () => {
     inquirer.prompt([
         {
@@ -94,6 +94,52 @@ addRole = () => {
     ]).then(answer => {
         connection.query(`INSERT INTO roles (title, salary, department_id) 
                             VALUES ("${answer.name}", ${answer.salary}, ${answer.department})`,
+            function(err, res) {
+                if (err) throw err;
+                afterConnection();
+        });
+    });
+};
+
+// Function to add an employee
+addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: 'Enter the first name of the new employee'
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: 'Enter the last name of the new employee'
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'Choose the new employee`s role',
+            choices: [
+                "Software Engineer",
+                "Structural Engineer",
+                "Sales Manager",
+                "Construction Manager",
+                "Seismologist"
+            ]
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: 'Choose this employee`s manager',
+            choices: [
+                "Martha Louisiana",
+                "Josiah Michigan",
+                "Martha Louisiana",
+                ""
+            ]
+        }
+    ]).then(answer => {
+        connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) 
+                            VALUES ("${answer.firstName}", "${answer.lastName}", 4, 3)`,
             function(err, res) {
                 if (err) throw err;
                 afterConnection();
