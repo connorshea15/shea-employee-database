@@ -19,6 +19,30 @@ const connection =require('./db/database');
         });
     return departmentArr;
   };  
+
+  getRolesArray = () => {
+    var roleArr = [];
+    connection.query(`SELECT title FROM roles`, 
+        function(err, res) {
+            if (err) throw err;
+            for ( var i = 0; i < res.length; i++ ) {
+                roleArr.push(i + 1 + " " + res[i].title);
+            };
+        });
+    return roleArr;
+  };  
+
+  getEmployeesArray = () => {
+    var employeeArr = [];
+    connection.query(`SELECT first_name, last_name FROM employees`, 
+        function(err, res) {
+            if (err) throw err;
+            for ( var i = 0; i < res.length; i++ ) {
+                employeeArr.push(i + 1 + " " + res[i].first_name + " " + res[i].last_name);
+            };
+        });
+    return employeeArr;
+  };  
   
 // Function to show all departments
 /* showAllDepartments = () => {
@@ -133,35 +157,23 @@ addEmployee = () => {
             type: 'list',
             name: 'role',
             message: 'Choose the new employee`s role',
-            choices: [
-                "Software Engineer",
-                "Structural Engineer",
-                "Sales Manager",
-                "Construction Manager",
-                "Seismologist"
-            ]
+            choices: getRolesArray()
         },
         {
             type: 'list',
             name: 'manager',
             message: 'Choose this employee`s manager',
-            choices: [
-                "Martha Louisiana",
-                "Josiah Michigan",
-                "Martha Louisiana",
-                ""
-            ]
+            choices: getEmployeesArray()
         }
     ]).then(answer => {
         connection.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) 
-                            VALUES ("${answer.firstName}", "${answer.lastName}", 4, 3)`,
+                            VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.role.charAt(0)}, ${answer.manager.charAt(0)})`,
             function(err, res) {
                 if (err) throw err;
                 afterConnection();
         });
     });
 };
-
 
   afterConnection = () => {
     
