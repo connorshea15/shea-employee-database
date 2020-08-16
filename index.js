@@ -8,6 +8,7 @@ const connection =require('./db/database');
     afterConnection();
   });
 
+  // Function to return simple array of departments
   getDepartmentsArray = () => {
     var departmentArr = [];
     connection.query(`SELECT name FROM departments`, 
@@ -20,6 +21,7 @@ const connection =require('./db/database');
     return departmentArr;
   };  
 
+  // Function to return simple array of departments
   getRolesArray = () => {
     var roleArr = [];
     connection.query(`SELECT title FROM roles`, 
@@ -32,6 +34,7 @@ const connection =require('./db/database');
     return roleArr;
   };  
 
+  // Function to return simple array of departments
   getEmployeesArray = () => {
     var employeeArr = [];
     connection.query(`SELECT first_name, last_name FROM employees`, 
@@ -43,23 +46,13 @@ const connection =require('./db/database');
         });
     return employeeArr;
   };  
-  
-// Function to show all departments
-/* showAllDepartments = () => {
-    connection.query(`SELECT * FROM departments`, 
-        function(err, res) {
-            if (err) throw err;
-            console.log(console.table(res));
-            afterConnection();
-        });
-}; */
 
+  // Array to display all of the departments
 showAllDepartments = () => {
     connection.promise().query(`SELECT * FROM departments`)
         .then( ([rows, fields]) => {
             console.log(console.table(rows));
             afterConnection();
-            return rows;
         })
         .catch(console.log);
 };
@@ -175,8 +168,35 @@ addEmployee = () => {
     });
 };
 
+// Function to add a department
+updateEmployeeRole = (employees) => {
+        inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Choose which employee you would like to update',
+            choices: employees
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'Choose the employee`s new role',
+            choices: getRolesArray()
+        }
+    ]).then(answer => {
+        connection.query(`UPDATE employees SET role_id = ${answer.role.charAt(0)} WHERE id = ${answer.employee.charAt(0)}`,
+            function(err, res) {
+                if (err) throw err;
+                afterConnection();
+        });
+    }).catch(err => {
+        console.log(err);
+    });
+};
+
+// This is my initial user prompt where the user decides what they want to do
   afterConnection = () => {
-    
+    var employees = getEmployeesArray();
     // we will inquire about what this person wants to do
     inquirer.prompt([
         {
@@ -190,7 +210,8 @@ addEmployee = () => {
             'Add a department!',
             'Add a role!',
             'Add an employee!',
-            'Update and employee role!'
+            'Update an employee role!',
+            'I am done!'
         ]
         }
     ]).then(answer => {
@@ -206,8 +227,12 @@ addEmployee = () => {
             return addRole();
         } else if (answer.start === 'Add an employee!') {
             return addEmployee();
-        } else if (answer.start === 'Update and employee role!') {
-            return updateEmployeeRole();
+        } else if (answer.start === 'Update an employee role!') {
+            return updateEmployeeRole(employees);
+        } else {
+            return;
         }
+    }).catch(err => {
+        console.log(err);
     });
   };
