@@ -13,21 +13,20 @@ showAllDepartments = () => {
     connection.query(`SELECT * FROM departments`, 
         function(err, res) {
             if (err) throw err;
+            console.log(res);
             console.log(console.table(res));
-            //connection.end();
             afterConnection();
         });
 };
 
 // Function to show all roles
 showAllRoles = () => {
-    connection.query(`SELECT roles.*, departments.name AS department_name
+    connection.query(`SELECT roles.id, roles.title, roles.salary, departments.name AS department_name
                         FROM roles
                         LEFT JOIN departments ON roles.department_id = departments.id;`, 
         function(err, res) {
             if (err) throw err;
             console.log(console.table(res));
-            //connection.end();
             afterConnection();
         });
 };
@@ -46,9 +45,60 @@ showAllEmployees = () => {
         function(err, res) {
             if (err) throw err;
             console.log(console.table(res));
-            //connection.end();
             afterConnection();
         });
+};
+
+// Function to add a department
+addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'department',
+            message: 'Enter the name of the new department'
+        }
+    ]).then(answer => {
+        connection.query(`INSERT INTO departments (name) VALUES ("${answer.department}")`,
+            function(err, res) {
+                if (err) throw err;
+                afterConnection();
+        });
+    });
+};
+
+// Function to add a department
+addRole = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'Enter the name of the new role'
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'Enter the salary for the new role'
+        },
+        {
+            type: 'list',
+            name: 'department',
+            message: 'Enter the department that this new role is a part of',
+            choices: [
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        }
+    ]).then(answer => {
+        connection.query(`INSERT INTO roles (title, salary, department_id) 
+                            VALUES ("${answer.name}", ${answer.salary}, ${answer.department})`,
+            function(err, res) {
+                if (err) throw err;
+                afterConnection();
+        });
+    });
 };
 
 
@@ -72,11 +122,20 @@ showAllEmployees = () => {
         }
     ]).then(answer => {
         if(answer.start === 'View all departments!') {
-            return showAllDepartments();
+            console.log(showAllDepartments());
+            // return showAllDepartments();
         } else if (answer.start === 'View all roles!') {
             return showAllRoles();
         } else if (answer.start === 'View all employees!') {
             return showAllEmployees();
+        } else if (answer.start === 'Add a department!') {
+            return addDepartment();
+        } else if (answer.start === 'Add a role!') {
+            return addRole();
+        } else if (answer.start === 'Add an employee!') {
+            return addEmployee();
+        } else if (answer.start === 'Update and employee role!') {
+            return updateEmployeeRole();
         }
     });
   };
