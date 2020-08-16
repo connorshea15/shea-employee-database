@@ -2,21 +2,42 @@ const cTable = require('console.table');
 const inquirer = require('inquirer');
 const connection =require('./db/database');
 
-  connection.connect(err => {
+ connection.connect(err => {
     if (err) throw err;
     console.log('connected as id ' + connection.threadId);
     afterConnection();
   });
+
+  getDepartmentsArray = () => {
+    var departmentArr = [];
+    connection.query(`SELECT name FROM departments`, 
+        function(err, res) {
+            if (err) throw err;
+            for ( var i = 0; i < res.length; i++ ) {
+                departmentArr.push(i + 1 + " " + res[i].name);
+            };
+        });
+    return departmentArr;
+  };  
   
 // Function to show all departments
-showAllDepartments = () => {
+/* showAllDepartments = () => {
     connection.query(`SELECT * FROM departments`, 
         function(err, res) {
             if (err) throw err;
-            console.log(res);
             console.log(console.table(res));
             afterConnection();
         });
+}; */
+
+showAllDepartments = () => {
+    connection.promise().query(`SELECT * FROM departments`)
+        .then( ([rows, fields]) => {
+            console.log(console.table(rows));
+            afterConnection();
+            return rows;
+        })
+        .catch(console.log);
 };
 
 // Function to show all roles
@@ -83,17 +104,11 @@ addRole = () => {
             type: 'list',
             name: 'department',
             message: 'Enter the department that this new role is a part of',
-            choices: [
-                1,
-                2,
-                3,
-                4,
-                5
-            ]
+            choices: getDepartmentsArray()
         }
     ]).then(answer => {
         connection.query(`INSERT INTO roles (title, salary, department_id) 
-                            VALUES ("${answer.name}", ${answer.salary}, ${answer.department})`,
+                            VALUES ("${answer.name}", ${answer.salary}, ${answer.department.charAt(0)})`,
             function(err, res) {
                 if (err) throw err;
                 afterConnection();
@@ -168,8 +183,7 @@ addEmployee = () => {
         }
     ]).then(answer => {
         if(answer.start === 'View all departments!') {
-            console.log(showAllDepartments());
-            // return showAllDepartments();
+            return showAllDepartments();
         } else if (answer.start === 'View all roles!') {
             return showAllRoles();
         } else if (answer.start === 'View all employees!') {
