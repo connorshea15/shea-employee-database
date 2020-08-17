@@ -5,40 +5,16 @@ const { getDepartmentsArray, showAllDepartments, addDepartment } = require('./li
 const { getRolesArray, showAllRoles, addRole } = require('./lib/roleFunctions');
 const { getEmployeesArray, showAllEmployees, addEmployee, updateEmployeeRole } = require('./lib/employeeFunctions');
 
+// Open connection between node and mysql
  connection.connect(err => {
     if (err) throw err;
     console.log('connected as id ' + connection.threadId);
     afterConnection();
   });
 
-// Function to add a department
-/* updateEmployeeRole = (employees) => {
-        inquirer.prompt([
-        {
-            type: 'list',
-            name: 'employee',
-            message: 'Choose which employee you would like to update',
-            choices: employees
-        },
-        {
-            type: 'list',
-            name: 'role',
-            message: 'Choose the employee`s new role',
-            choices: getRolesArray()
-        }
-    ]).then(answer => {
-        connection.query(`UPDATE employees SET role_id = ${answer.role.charAt(0)} WHERE id = ${answer.employee.charAt(0)}`,
-            function(err, res) {
-                if (err) throw err;
-                afterConnection();
-        });
-    }).catch(err => {
-        console.log(err);
-    });
-}; */
-
 // This is my initial user prompt where the user decides what they want to do
   afterConnection = () => {
+    // Store simple array of employee names to work with in later functions
     var employees = getEmployeesArray();
     // we will inquire about what this person wants to do
     inquirer.prompt([
